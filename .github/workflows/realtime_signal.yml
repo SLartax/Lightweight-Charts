@@ -1,10 +1,10 @@
-name: Real-time Signal Detection
+name: Lightweight Charts Signal Detection - 17:30
 
 on:
-  push:
-    branches: [main]
   schedule:
-    - cron: '*/5 * * * *'  # Check every 5 minutes for real-time signals
+    # Daily signal check at 17:30 CET (16:30 UTC)
+    # Using Lightweight Charts data for precise signal analysis
+    - cron: '30 16 * * *'
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Check for trading signals
+      - name: Check Lightweight Charts signals at 17:30 CET
         env:
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
           RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
@@ -34,20 +34,25 @@ jobs:
         run: |
           python -c "
           import sys
+          import datetime
           sys.path.insert(0, '.')
           from modules.data_fetcher import get_latest_data
           from modules.trading_logic import detect_signal
           from modules.email_service import send_email
           import os
           
-          # Fetch latest market data
+          # Log execution time (17:30 CET)
+          now = datetime.datetime.now(datetime.timezone.utc)
+          print(f'Signal check execution: {now.isoformat()} UTC')
+          
+          # Fetch latest Lightweight Charts data
           data = get_latest_data()
           
-          # Check for trading signals
+          # Analyze for trading signals using Lightweight Charts precision
           signal = detect_signal(data)
           
           if signal:
-              # Send email notification immediately on signal
+              # Send email notification at 17:30 CET
               sender = os.getenv('SENDER_EMAIL')
               recipient = os.getenv('RECIPIENT_EMAIL')
               password = os.getenv('SENDER_PASSWORD')
@@ -56,10 +61,10 @@ jobs:
                   sender=sender,
                   recipient=recipient,
                   password=password,
-                  subject=f'Trading Signal Detected: {signal}',
-                  body=f'A trading signal has been detected:\n\nSignal Type: {signal}\nTime: {data[\"timestamp\"]}\nPrice: {data[\"price\"]}'  
+                  subject=f'[17:30 CET] Lightweight Charts Signal: {signal}',
+                  body=f'Trading signal detected at 17:30 CET via Lightweight Charts:\n\nSignal Type: {signal}\nTime: {data[\"timestamp\"]}\nPrice: {data[\"price\"]}\n\nSystem: Lightweight Charts Precision Analysis'  
               )
-              print(f'Signal detected and email sent: {signal}')
+              print(f'[17:30] Signal detected and email sent: {signal}')
           else:
-              print('No signal detected')
+              print('[17:30] No signal detected at scheduled time')
           "
